@@ -42,11 +42,18 @@ void print_filebuf() {
     int i = 0;
     while (file_buf1[i] != '\0') {
         printf("<%s", file_buf1[i]);
+        if (strlen(file_buf1[i]) == 0) {
+            printf("\n");
+        }
         ++i;
     }
+    printf("-------------------\n");
     i = 0;
     while (file_buf2[i] != '\0') {
         printf(">%s", file_buf2[i]);
+        if (strlen(file_buf2[i]) == 0) {
+            printf("\n");
+        }
         ++i;
     }
 }
