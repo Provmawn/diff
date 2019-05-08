@@ -2,59 +2,57 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUFSIZE 256
+#define LINE_BUFSIZE 256
+#define FILE_BUFSIZE 10
 
 void print_filebuf();
 int getline_(char* line, int max);
 char* fgets(char* s, int n, FILE* iop);
 int fputs_(char* s, FILE* iop);
 FILE* open_file(char* name, char* mode);
+void read_lines(char** file_buf, int file_buf_size, char* line_buf, int line_buf_size, FILE* file);
 
-char* file_buf1[BUFSIZE];
-char* file_buf2[BUFSIZE];
+char* lhs_file_buf[FILE_BUFSIZE];                           // storage for left input file
+char* rhs_file_buf[FILE_BUFSIZE];                           // storage for right input file
 
 int main(int argc, const char* argv[]) {
-    char buf1[BUFSIZE], buf2[BUFSIZE];
-    memset(buf1, '\0', BUFSIZE - 1);
-    memset(buf2, '\0', BUFSIZE - 1);
-    FILE* fp1;
-    FILE* fp2;
-    fp1 = open_file("a.txt", "r");
-    fp2 = open_file("b.txt", "r");
-    int comp;
-    int i = 0;
-    while (fgets(buf1, BUFSIZE - 1 , fp1) != NULL || fgets(buf2, BUFSIZE - 1, fp2) != NULL) {
-        if ((comp = strcmp(buf1, buf2)) != 0) {
-            file_buf1[i] = malloc(sizeof(buf1));
-            strcpy(file_buf1[i], buf1);
-            file_buf2[i] = malloc(sizeof(buf2));
-            strcpy(file_buf2[i], buf2); 
-            ++i;
-        }
-    }
-    print_filebuf();
-    fclose(fp1);
-    fclose(fp2);
+    char lhs_line_buf[LINE_BUFSIZE], rhs_line_buf[LINE_BUFSIZE];  // storage for individual lines
+    memset(lhs_line_buf, '\0', LINE_BUFSIZE - 1);
+    memset(rhs_line_buf, '\0', LINE_BUFSIZE - 1);
+    FILE* lhs_fp;                                       // storage for 
+    FILE* rhs_fp;
+    lhs_fp = open_file("left.txt", "r");
+    rhs_fp = open_file("right.txt", "r");
+    read_lines(lhs_file_buf, FILE_BUFSIZE, lhs_line_buf, LINE_BUFSIZE, lhs_fp);
+    read_lines(rhs_file_buf, FILE_BUFSIZE, rhs_line_buf, LINE_BUFSIZE, rhs_fp);
+    print_filebuf(lhs_file_buf, FILE_BUFSIZE);
+    printf("--------------------------------\n");
+    print_filebuf(rhs_file_buf, FILE_BUFSIZE);
+    fclose(lhs_fp);
+    fclose(rhs_fp);
     return EXIT_SUCCESS;
 }
 
-void print_filebuf() {
-    int i = 0;
-    while (file_buf1[i] != '\0') {
-        printf("<%s", file_buf1[i]);
-        if (strlen(file_buf1[i]) == 0) {
-            printf("\n");
-        }
-        ++i;
+void read_lines(char** file_buf, int file_buf_size, char* line_buf, int line_buf_size, FILE* file) {
+    char** pend = file_buf + file_buf_size; 
+    char** pstart = file_buf;
+    while (pstart < pend && fgets(line_buf, line_buf_size, file) != NULL) {
+        *pstart++ = strdup(line_buf);
     }
-    printf("-------------------\n");
-    i = 0;
-    while (file_buf2[i] != '\0') {
-        printf(">%s", file_buf2[i]);
-        if (strlen(file_buf2[i]) == 0) {
-            printf("\n");
+}
+
+void print_filebuf(char** file_buf, int file_buf_size) {
+    char** pend = file_buf + file_buf_size;
+    char** pstart = file_buf;
+    int i = 1;
+    while (pstart < pend && *pstart != NULL) {
+        if (strlen(*pstart) == 0) {
+            printf("%d: \n", i);
+        } else {
+            printf("%d: %s", i, *pstart);
         }
         ++i;
+        ++pstart;
     }
 }
 
@@ -70,7 +68,7 @@ char* fgets(char* s, int n, FILE* iop) {
     register char* cs;
 
     cs = s;
-    while (--n > 0 && (c = getc(iop)) != EOF) {
+    while (--n > 1 && (c = getc(iop)) != EOF) {
         if ((*cs++ = c) == '\n') {
             break;
         }
