@@ -14,13 +14,11 @@
 struct para {
     char* line_buf[LINE_BUFSIZE];
     int pos;
-    int print_flag;
 };
 
 struct file_buf {
     struct para* para[PARA_BUFSIZE];
     int pos;
-    int print_flag;
 };
 
 int getline_(char* line, int max);
@@ -138,15 +136,21 @@ void para_add_line(char* line, struct para* para) {
 
 void para_compare(struct file_buf* lhs, struct file_buf* rhs) {
     int lhs_para_i, rhs_para_i;
-    lhs_para_i = rhs_para_i = 0;
-    while (lhs_para_i < lhs->pos) {
-        para_printboth(lhs->para[lhs_para_i]);
-        ++lhs_para_i;
+    lhs_para_i = 0;
+    rhs_para_i = 0;
+    while (lhs_para_i < lhs->pos || rhs_para_i < rhs->pos) {
+        printf("%s\n", (lcs(lhs->para[lhs_para_i]->line_buf, rhs->para[rhs_para_i]->line_buf, '<', lhs->para[lhs_para_i]->pos, rhs->para[rhs_para_i]->pos)));
+        printf("%s\n", (lcs(lhs->para[lhs_para_i]->line_buf, rhs->para[rhs_para_i]->line_buf, '=', lhs->para[lhs_para_i]->pos, rhs->para[rhs_para_i]->pos)));
+        printf("%s\n", (lcs(lhs->para[lhs_para_i]->line_buf, rhs->para[rhs_para_i]->line_buf, '>', lhs->para[lhs_para_i]->pos, rhs->para[rhs_para_i]->pos)));
+        if (lhs_para_i < lhs->pos) {
+            ++lhs_para_i;
+        }
+        if (rhs_para_i < rhs->pos) {
+            ++rhs_para_i;
+        }
     }
-
-    while (lhs_para_i < lhs->pos) {
-        \
-    }
+    //lcs(lhs->para->line_buf, rhs->para->line_buf, '=', lhs->para->line_buf->pos, rhs->para->line_buf->pos);
+    //lcs(lhs->para->line_buf, rhs->para->line_buf, '>', lhs->para->line_buf->pos, rhs->para->line_buf->pos);
 }
 
 int para_match(struct para* lhs, struct para* rhs) {

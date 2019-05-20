@@ -1,12 +1,12 @@
 #include "lcs.h"
 
-char* derive_sequence(char* str_a, char* str_b, int i, int j, char sym) {
-    char* str = (char*) malloc(sizeof(char)*MAXLINE);
+char* derive_sequence(char* str_a[MAXLINE], char* str_b[MAXLINE], int i, int j, char sym) {
+    char** str = malloc(sizeof(char)*MAXLINE);
 
     while (i != 0 && j != 0) {
         if (symbol_matrix[i][j] == 's') {
             if (sym == '=') {
-                sprintf(str + strlen(str), "%c: %c\n", sym, str_a[i]);
+                sprintf(str + strlen(str), "%c: %s\n", sym, str_a[i]);
             }
             --i;
             --j;
@@ -14,25 +14,26 @@ char* derive_sequence(char* str_a, char* str_b, int i, int j, char sym) {
             --j;
         } else {
             if (sym == '<' || sym == '>') {
-                sprintf(str + strlen(str), "%c: %c\n", sym, str_a[i]);
+                sprintf(str + strlen(str), "%c: %s\n", sym, str_a[i]);
             }
             --i;
         }
     }
+    reverse(str);
     return str;
 }
 
-char* lcs(char* str_a, char* str_b, char sym) {
+char* lcs(char* str_a[MAXLINE], char* str_b[MAXLINE], char sym, int len_a, int len_b) {
     int i, j;
-    int len_a, len_b;
-    len_a = strlen(str_a);
-    len_b = strlen(str_b);
+    //int len_a, len_b; for single line comparison
+    //len_a = strlen(str_a);
+    //len_b = strlen(str_b);
     i = 1;
     j = 1;
     while (i < len_a) {
         j = 1;
         while (j < len_b) {
-            if (str_a[i] == str_b[j]) {
+            if (strcmp(str_a[i], str_b[j]) == 1) {
                 count_matrix[i][j] = count_matrix[i-1][j-1] + 1;
                 symbol_matrix[i][j] = 's';
             } else if (count_matrix[i][j-1] > count_matrix[i-1][j]) {
