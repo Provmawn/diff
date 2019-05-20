@@ -5,10 +5,11 @@
 #define LINE_BUFSIZE 256
 #define PARA_BUFSIZE 256
 #define FILE_BUFSIZE 10
-#define PRINT_LHS 0
-#define PRINT_RHS 1
-#define PRINT_BOTH 2
-#define PRINT_NEITHER 3
+
+#define HASHSIZE 200
+
+#include "lcs.h"
+
 
 struct para {
     char* line_buf[LINE_BUFSIZE];
@@ -22,7 +23,6 @@ struct file_buf {
     int print_flag;
 };
 
-void print_filebuf();
 int getline_(char* line, int max);
 char* fgets(char* s, int n, FILE* iop);
 int fputs_(char* s, FILE* iop);
@@ -34,17 +34,32 @@ void para_compare(struct file_buf* lhs, struct file_buf* rhs);
 void file_buf_add_both(char* para_buf, struct file_buf* fbuf);
 void para_add_line(char* line, struct para* para);
 struct para* para_create(char* para); 
+void para_print(struct para* para);
 void para_printright(struct para* para);
 void para_printleft(struct para* para);
 void para_printboth(struct para* para);
 int para_match(struct para* lhs, struct para* rhs);
 char* strdup_nullcheck(char* s);
 
+unsigned int hash(char* s);
+
 struct file_buf lhs_file_buf;
 struct file_buf rhs_file_buf;
 struct file_buf diff_buf;
 
 int main(int argc, const char* argv[]) {
+    ++argv;
+    int c;
+    while (argc > 1) {
+        if (**argv == '-') {
+            //c = hash(*argv);
+            printf("%s\n", *argv);
+        } else {
+            printf("Invalid arg.\n");
+        }
+        ++argv;
+        --argc;
+    }
     char lhs_line_buf[LINE_BUFSIZE], rhs_line_buf[LINE_BUFSIZE];  // storage for individual lines
     memset(lhs_line_buf, '\0', LINE_BUFSIZE - 1);
     memset(rhs_line_buf, '\0', LINE_BUFSIZE - 1);
@@ -83,6 +98,16 @@ int main(int argc, const char* argv[]) {
     return EXIT_SUCCESS;
 }
 
+unsigned int hash(char* s) {
+    unsigned int hashval;
+    hashval = 0;
+    while (*s != '\0') {
+        hashval = *s + 31 * hashval;
+        ++s;
+    }
+    return hashval % HASHSIZE;
+}
+
 struct para* para_create(char* para) {
     struct para* p = (struct para*) malloc(sizeof(struct para));
     p->pos = 0;
@@ -117,6 +142,10 @@ void para_compare(struct file_buf* lhs, struct file_buf* rhs) {
     while (lhs_para_i < lhs->pos) {
         para_printboth(lhs->para[lhs_para_i]);
         ++lhs_para_i;
+    }
+
+    while (lhs_para_i < lhs->pos) {
+        \
     }
 }
 

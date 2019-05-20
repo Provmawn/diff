@@ -1,6 +1,6 @@
 CC = clang
 COMPILER_FLAGS = -g
-OBJ = main.c
+OBJ = lcs.c main.c
 OBJ_OUT = main
 
 all : $(OBJ)
